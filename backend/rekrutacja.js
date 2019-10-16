@@ -1,10 +1,8 @@
 var express = require("express");
 var passport = require("passport");
-var Strategy = require('passport-local').Strategy;
-
-
+var session = require('express-session');
 const app = express()
-const port = 3000
+const port = 3000;
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 
@@ -13,172 +11,46 @@ const port = 3000
 
 
 // my not so secret secret
-var secret = 'eeeek',
- 
+var secret = 'eeeek';
+
 // the single user record that is hard
 // coded in for the sake of this simple demo
-user = {
-    username: 'foo',
-    id: 0,
-    password: '123'
-};
+
 // using ejs for rendering
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
- 
+
+//CONFIGURATION========================
+require('./app/config/passport')(passport); // pass passport for configuration
 // using body parser to parse the body of incoming post requests
 app.use(require('body-parser').urlencoded({
     extended: true // must give a value for extended
 }));
- 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
 // using express-session for session cookies
 app.use(
- 
     require('express-session')(
- 
         {
             name: 'site_cookie',
             secret: secret,
             resave: false,
             saveUninitialized: false,
             cookie: {
- 
-                // make session cookies only last 15 seconds
-                // for the sake of this demo
                 maxAge: 15000
- 
             }
         }
- 
     )
- 
 );
- 
-// using the local strategy with passport
-passport.use(
- 
-    // calling the constructor given by passport-local
-    new Strategy(
- 
-        // options for passport local
-        {
- 
-            // using custom field names
-            usernameField: 'user',
-            passwordField: 'pass'
- 
-        },
- 
-        // login method
-        function (username, password, cb) {
- 
-            if (username === user.username && password.toString() === user.password) {
- 
-                return cb(null, user);
- 
-            }
- 
-            // null and false for all other cases
-            return cb(null, false);
- 
-        }
- 
-    )
- 
-);
- 
-passport.serializeUser(function (user, cb) {
-    cb(null, user.id);
-});
- 
-passport.deserializeUser(function (id, cb) {
- 
-    cb(null, user);
- 
-});
- 
 app.use(passport.initialize());
 app.use(passport.session());
- 
-app.get('/', function (req, res) {
- 
-    res.render('index', {
-        layout: 'home',
-        user: req.user
-    });
- 
-});
- 
-app.get('/login',
- 
-    function (req, res) {
-    res.render('index', {
-        layout: 'login',
-        user: req.user
-    });
-});
-/*
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
 
-app.get('/server', ensureAuthenticated, routes.server.get);
-app.get('/login', routes.login.get);
-*/
-app.post('/dystans',function (req, res, next) {
-    if (req.isAuthenticated()) {
-        console.log(req.body)
-        console.log("logged");    
-        
-        //res.sendStatus(200);
-        res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-    }
-    else
-    res.redirect('/login');
-});
-app.get('/dystans',function (req, res) {
-    res.render('index', {
-        layout: 'dystans',
-        user: req.user
-    });
-});
-    
- 
-    // end up at / if login works
-    
-app.post('/login',
-    passport.authenticate('local', {
-        // redirect back to /login
-        // if login fails
-        failureRedirect: '/login'
-    }),
- 
-    // end up at / if login works
-    function (req, res) {
-        res.redirect('/');
-    }
-);
- 
-app.get('/logout',
-    function (req, res) {
-    req.logout();
-    res.redirect('/');
-});
- 
+// routes ===========================================
+require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+
 app.listen(port, function () {
- 
     console.log('passport-local demo up on port: ' + port);
- 
 });
-app.get('/login',
- 
-    function (req, res) {
-    res.render('index', {
-        layout: 'login',
-        user: req.user
-    });
-});
+
 ///****************** */
 var fs = require('fs');
 //
@@ -186,7 +58,7 @@ var traces,
     isVisited ={};
 
 /**
- *Making array containing visited stops and distance to Start 
+ *Making array containing visited stops and distance to Start
  * @param {obj} parsed file
  */
 function prepareIsVisitedArray(json_file){
@@ -197,7 +69,7 @@ function prepareIsVisitedArray(json_file){
 }
 
 /**
- * making traces bi-directional 
+ * making traces bi-directional
  * @param {obj} parsed file
  * @returns {null}
  */
@@ -223,9 +95,9 @@ function Init(filename){
     makeBidirectional(json_file);
 }
 
-/** 
+/**
  * Define begining stop
- * @param {string} start id of the starting stop  
+ * @param {string} start id of the starting stop
  * @returns {number} if everything ok returns 0 else 1
 */
 function initializeDistances(start){
@@ -240,8 +112,8 @@ function initializeDistances(start){
     else return 0;
 }
 /**
- * Searching through traces array to find the shortest distance to next stop 
-* @param {string} start type: string id of the starting stop  
+ * Searching through traces array to find the shortest distance to next stop
+* @param {string} start type: string id of the starting stop
 */
 function findDistances(target){
     var previousDistace = isVisited[target].value;
@@ -259,9 +131,9 @@ function findDistances(target){
     markAsVisited(target);
 }
 /**
- * 
+ *
  * @param {string} target marking as visited in isVisited array
- * @returns {number} retuns 1 
+ * @returns {number} retuns 1
  */
 function markAsVisited(target){
     isVisited[target].isVisited = true;
@@ -283,7 +155,7 @@ function chooseSubTarget(){
 }
 
 /**
- * 
+ *
  * @param {string} Start id of first element to measure from
  * @returns {Array} list of distances between Start and all stops
  */
