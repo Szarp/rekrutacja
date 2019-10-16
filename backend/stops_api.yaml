@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: JaKDojade in Solvro City
+  version: 1.0.0
+paths:
+  /stops:
+    get:
+      summary: Returns list of stops in Solvro City.
+      responses:
+        '200':
+          description: JSON array of checklists' names.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+              example: [
+                          {
+                            "name": "Przystanek 1"
+                          },
+                          {
+                            "name": "Przystanek 2"
+                          }
+                        ]
+  /path:
+    get:
+      summary: Returns list of stops in path and total distance.
+      parameters:
+        - in: query
+          name: source
+          required: true
+          schema:
+            type: string
+          description: Stop where the path begins
+        - in: query
+          name: target
+          required: true
+          schema:
+            type: string
+          description: Stop where the path ends
+      responses:
+        '200':
+          description: JSON containing stops and total distance
+          content:
+            application/json:
+              schema:
+                type: object
+              example: {
+                "stops": [
+                  {
+                    "name": "Przystanek 1"
+                  },
+                  {
+                    "name": "Przystanek 2"
+                  }
+                ],
+                "distance": 12
+              }
