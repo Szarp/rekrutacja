@@ -1,4 +1,13 @@
 module.exports = function(app, passport) {
+    /**
+   * @swagger
+   * /:
+   *   get:
+   *     description: Returns the homepage
+   *     responses:
+   *       200:
+   *         description: hello world
+   */
     app.get('/', function (req, res) {
         res.render('index', {
             layout: 'home',
@@ -21,8 +30,16 @@ module.exports = function(app, passport) {
             user: req.user
         });
     });
-
     // LOGIN ==============================
+    /**
+   * @swagger
+   * /login:
+   *   get:
+   *     description: Place to login
+   *     responses:
+   *       200:
+   *         description: retruns the login page
+   */
     app.get('/login',
         function (req, res) {
         res.render('index', {
@@ -30,12 +47,43 @@ module.exports = function(app, passport) {
             user: req.user
         });
     });
+    /**
+   * @swagger
+   * /login:
+   *   post:
+   *     description: Authentication the form with user credentials
+   *     parameters:
+   *        - in: query
+   *          name: user
+   *          required: true
+   *          schema:
+   *            type: string
+   *          description: Stop where the path begins
+   *        - in: query
+   *          name: pass
+   *          required: true
+   *          schema:
+   *            type: string
+   *          description: Stop where the path ends
+   *     responses:
+   *       200:
+   *         description: Redirect to /profile if succesfully logged
+   */
     app.post('/login', passport.authenticate('local-login', {
         successRedirect : '/profile',
         failureRedirect : '/login',
         failureFlash : false // allow flash messages
     }));
     // PROFILE ==============================
+    /**
+   * @swagger
+   * /profile:
+   *   get:
+   *     description: Profile page for logged users
+   *     responses:
+   *       200:
+   *         description: Redirect to /profile if user is logged; to /login
+   */
     app.get('/profile', isLoggedIn, function(req, res) {
         res.render('index', {
             layout: 'profile',
@@ -43,11 +91,29 @@ module.exports = function(app, passport) {
         });
     });
     // SIGNUP ==============================
+    /**
+   * @swagger
+   * /signup:
+   *   get:
+   *     description: Form to creating new accont
+   *     responses:
+   *       200:
+   *         description: Page with form to login
+   */
     app.get('/signup', function(req, res) {
         res.render('index',{
             layout: 'signup'
         });
     });
+    /**
+   * @swagger
+   * /signup:
+   *   post:
+   *     description: Process signup request
+   *     responses:
+   *       200:
+   *         description: Redirect to /profile if user is logged; to /signup if not
+   */
     app.post('/signup', passport.authenticate('local-signup', {
         successRedirect : '/profile',
         failureRedirect : '/signup',
@@ -55,13 +121,107 @@ module.exports = function(app, passport) {
     }));
 
     // LOGOUT ==============================
+    /**
+   * @swagger
+   * /logout:
+   *   get:
+   *     description: Logout the user
+   *     responses:
+   *       200:
+   *         description: Redirect /home
+   */
     app.get('/logout', function(req, res) {
         req.logout();
+        res.redirect('/');
+    });
+
+    /**
+     * @swagger
+     * /stops:
+     *  get:
+     *      description: Returns list of stops in Solvro City.
+     *      responses:
+     *          200:
+     *              description: JSON array of checklists' names.
+     *              content:
+     *                  application/json:
+     *              schema:
+     *                  type: object
+     *              example: {
+     *                  "stops": [
+     *                  {
+     *                      "name": "Przystanek 1"
+     *                 },
+     *                  {
+     *                      "name": "Przystanek 2"
+     *                 }
+     *                  ],
+     *                  "distance": 12
+     *              }
+     */
+    app.get('/stops', function(req, res) {
+
+        res.redirect('/');
+    });
+    /**
+     * @swagger
+     * /path:
+     *   get:
+     *       descripton: Returns list of stops in path and total distance.
+     *       parameters:
+     *          - in: query
+     *            name: source
+     *            required: true
+     *            schema:
+     *              type: string
+     *            description: Stop where the path begins
+     *          - in: query
+     *            name: target
+     *            required: true
+     *            schema:
+     *              type: string
+     *            description: Stop where the path ends
+     *       responses:
+     *           200:
+     *               description: JSON containing stops and total distance.
+     *               content:
+     *                   application/json:
+     *               schema:
+     *                   type: object
+     *               example: {
+     *                   "stops": [
+     *                   {
+     *                       "name": "Przystanek 1"
+     *                   },
+     *                   {
+     *                       "name": "Przystanek 2"
+     *                   }
+     *                   ],
+     *                   "distance": 12
+     *               }
+    */
+    app.get('/path', function(req, res) {
+
         res.redirect('/');
     });
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated())
             return next();
-        res.redirect('/');
-    }
+        res.redirect('/login');
 }
+}
+/*
+            parameters:
+                - in: query
+                  name: source
+                  required: true
+                  schema:
+                    type: string
+                  description: Stop where the path begins
+                - in: query
+                  name: target
+                  required: true
+                  schema:
+                    type: string
+                  description: Stop where the path ends
+                  */
