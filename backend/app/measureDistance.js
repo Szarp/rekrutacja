@@ -32,6 +32,55 @@ function makeBidirectional(json_file){
     }
     return null;
 }
+/*
+.json file must have:
+    - nodes:
+        list containg id and name
+    - links:
+        list containg distance source and target
+    - id in links must be same in nodes
+    -
+*/
+function checkFile(parsedFile){
+    console.log("hi")
+    let nodes,links,el;
+    try{
+        if(parsedFile.nodes === undefined){
+            throw ("No nodes in file")
+        }
+        if(parsedFile.links === undefined){
+            throw ("No links in file")
+        }
+        nodes = parsedFile.nodes;
+        links = parsedFile.links;
+        if(nodes.length == 0 || links.length == 0){
+            throw("Empty element list");
+        }
+        for (let k=0;k<nodes.length;k++){
+            if(nodes[k].id === undefined){
+                throw("No id in "+k+"\'s element");
+            }
+            if(nodes[k].stop_name === undefined){
+                throw("No stop_name in "+k+"\'s element");
+            }
+        }
+        for (let k=0;k<links.length;k++){
+            if(links[k].distance === undefined){
+                throw("No distance in "+k+"\'s element");
+            }
+            if(links[k].source === undefined){
+                throw("No source in "+k+"\'s element");
+            }
+            if(links[k].target === undefined){
+                throw("No target in "+k+"\'s element");
+            }
+        }
+    }catch(e){
+        throw(e)
+    }
+}
+
+
 /**
  * Initialize .json file
  * @param {string} filename name of the .json file
@@ -39,7 +88,17 @@ function makeBidirectional(json_file){
 function Init(filename){
     //solvro_city.json
     let f = fs.readFileSync(filename,"utf-8");
-    var json_file = JSON.parse(f);
+    if(!f){
+        throw("Empty .json file");
+    }
+    var json_file;
+    try {
+        json_file = JSON.parse(f);
+    }
+    catch (e) {
+        throw(e);
+    }
+    checkFile(json_file);
     prepareIsVisitedArray(json_file);
     makeBidirectional(json_file);
     cityList = json_file.nodes;
