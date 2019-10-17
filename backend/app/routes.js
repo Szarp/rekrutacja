@@ -110,6 +110,19 @@ module.exports = function(app, passport) {
    * /signup:
    *   post:
    *     description: Process signup request
+   *     parameters:
+   *       - in: query
+   *         name: email
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Stop where the path begins
+   *       - in: query
+   *         name: password
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Stop where the path ends
    *     responses:
    *       200:
    *         description: Redirect to /profile if user is logged; to /signup if not
@@ -134,7 +147,6 @@ module.exports = function(app, passport) {
         req.logout();
         res.redirect('/');
     });
-
     /**
      * @swagger
      * /stops:
@@ -155,12 +167,10 @@ module.exports = function(app, passport) {
      *                  {
      *                      "name": "Przystanek 2"
      *                 }
-     *                  ],
-     *                  "distance": 12
+     *                  ]
      *              }
      */
     app.get('/stops', function(req, res) {
-
         res.redirect('/');
     });
     /**
@@ -208,20 +218,5 @@ module.exports = function(app, passport) {
         if (req.isAuthenticated())
             return next();
         res.redirect('/login');
+    }
 }
-}
-/*
-            parameters:
-                - in: query
-                  name: source
-                  required: true
-                  schema:
-                    type: string
-                  description: Stop where the path begins
-                - in: query
-                  name: target
-                  required: true
-                  schema:
-                    type: string
-                  description: Stop where the path ends
-                  */
