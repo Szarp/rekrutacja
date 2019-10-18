@@ -115,13 +115,13 @@ module.exports = function(app, passport) {
    *     description: Process signup request
    *     parameters:
    *       - in: query
-   *         name: email
+   *         name: user
    *         required: true
    *         schema:
    *           type: string
    *         description: Stop where the path begins
    *       - in: query
-   *         name: password
+   *         name: pass
    *         required: true
    *         schema:
    *           type: string

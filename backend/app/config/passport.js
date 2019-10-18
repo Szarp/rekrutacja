@@ -1,25 +1,40 @@
-// load all the things we need
+var bcrypt   = require('bcrypt-nodejs');
 var Strategy = require('passport-local').Strategy;
-var user = {
-    username: 'foo',
-    id: 0,
-    password: '123'
-};
-module.exports = function(passport) {     
-    // using the local strategy with passport
+var fs = require('fs');
+
+let users = fs.readFileSync('./app/config/userList1.json',"utf-8");
+users = JSON.parse(users);
+var allUsers = users.all_users;
+var userList = users.user_list;
+
+module.exports = function(passport) {
+    /**
+     * LocalStrategy for signup
+     */
     passport.use('local-signup', new Strategy({
-        // by default, local strategy uses username and password, we will override with email
-        usernameField : 'email',
-        passwordField : 'password',
-        passReqToCallback : false // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+        usernameField : 'user',
+        passwordField : 'pass'
     },
-    function(email, password, cb) {
-        console.log(email,password,"hi");
-    //    if (email)
-    //        email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
-        console.log("succesfully created accont");
-        return cb(null, user);
+    function (username, password, cb) {
+        console.log(username,password,"hi");
+        let index = userList.indexOf(username);
+                let validUser = false;
+                if(index == -1){
+                    let hash = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+                    let userObj = {"username":username,"hash_password":hash,"id":allUsers.length};
+                    addUserToFile(userObj);
+                    return cb(null, userObj.id);
+                    //console.log(userObj);
+                }
+                else{
+                    console.log("There is an user with same nickname, please change it");
+                }
+                return cb(null, false);
+        return cb(null, false);
     }));
+    /**
+     * LocalStrategy for login
+     */
     passport.use('local-login',new Strategy({
                 // using custom field names
                 usernameField: 'user',
@@ -27,23 +42,32 @@ module.exports = function(passport) {
             },
             // login method
             function (username, password, cb) {
-                if (username === user.username && password.toString() === user.password) {
-                    console.log("valid user");
-                    return cb(null, user);
+                let index = userList.indexOf(username);
+                let validUser = false;
+                if(index != -1){
+                    if(bcrypt.compareSync(password, allUsers[index].hash_password)){
+                        return cb(null, allUsers[index]);
+                    }
                 }
-                // null and false for all other cases
                 return cb(null, false);
             }
         )
     );
-    
-    passport.serializeUser(function (user, cb) {
-        cb(null, user.id);
+    passport.serializeUser(function (id, cb) {
+        cb(null, id);
     });
-    
     passport.deserializeUser(function (id, cb) {
-    
-        cb(null, user);
-    
+        cb(null, id);
     });
+    /**
+     * Function to add user to list and save to file
+     * @param {object} userObj object containg {username:,hash_password_id}
+     */
+    function addUserToFile(userObj){
+        users.all_users.push(userObj);
+        users.user_list.push(userObj.username);
+        fs.writeFileSync('./app/config/userList1.json',JSON.stringify(users),"utf-8");
+        return true;
+
+    }
 };
