@@ -1,3 +1,6 @@
+const distance = require('./measureDistance.js');
+distance.loadFile('solvro_city1.json');
+
 module.exports = function(app, passport) {
     /**
    * @swagger
@@ -171,7 +174,9 @@ module.exports = function(app, passport) {
      *              }
      */
     app.get('/stops', function(req, res) {
-        res.redirect('/');
+        console.log(distance.cityNames());
+        res.send(distance.cityNames());
+        //res.redirect('/');
     });
     /**
      * @swagger
@@ -211,8 +216,23 @@ module.exports = function(app, passport) {
      *               }
     */
     app.get('/path', function(req, res) {
-
-        res.redirect('/');
+        //console.log(distance.distById("1","2"));
+        var params = req.query,
+            s = params["source"],
+            t = params["target"];
+        if(s && t){
+            //distance.initializeDistances(s)
+            //console.log(distance.distById(s,t));
+            res.send(distance.distById(s,t));
+        }
+        else{
+            console.log("no parameters");
+            res.send("no parameters")
+        }
+        //console.log(req.query);
+        //res.send(distance.distById("0","0"))
+        //res.redirect('/');
+        //res.send("ok");
     });
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated())

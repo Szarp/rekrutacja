@@ -1,12 +1,7 @@
-//measureDistance.js
-
-
 var fs = require('fs');
-//
 var traces,
     isVisited ={},
     cityList;
-
 /**
  *Making array containing visited stops and distance to Start
 * @param {obj} parsed file
@@ -14,6 +9,17 @@ var traces,
 function prepareIsVisitedArray(json_file){
     for (var k =0;k<json_file.nodes.length;k++){
         isVisited[json_file.nodes[k].id]={"isVisited":false,"value":undefined};
+    }
+    return;
+}
+/**
+ *Making array containing visited stops and distance to Start
+* @param {obj} parsed file
+*/
+function clearIsVisitedArray(){
+    for (var k =0;k<isVisited.length;k++){
+        isVisited[k]={"isVisited":false,"value":undefined};
+        console.log("clear",isVisited);
     }
     return;
 }
@@ -109,6 +115,7 @@ function Init(filename){
  * @returns {number} if everything ok returns 0 else 1
 */
 function initializeDistances(start){
+    clearIsVisitedArray();
     for(var i=0;i<traces.length;i++){
         if(traces[i].source == start){
             isVisited[traces[i].target].value = traces[i].distance;
@@ -160,7 +167,6 @@ function chooseSubTarget(){
     return false;
 }
 /**
- *
  * @param {string} Start id of first element to measure from
  * @returns {Array} list of distances between Start and all stops
  */
@@ -180,16 +186,30 @@ function cityNames(){
     return cityList;
 }
 /**
- *
  * @param {string} name name of the stop
  * @returns {string|boolean} id of the stop if is in the list; false if found nothing
  */
 function nameToId(name){
-    let l = cityNames;
+    let l = cityNames();
     for (var k=0; k<l.length;k++){
         let el = l[k];
         if(el["stop_name"] === name){
             return el["id"]
+        }
+    }
+    return false;
+}
+/**
+ * @param {string} id id of the stop
+ * @returns {string|boolean} name of the stop if is in the list; false if found nothing
+ */
+function idToName(id){
+    let l = cityNames();
+    for (var k=0; k<l.length;k++){
+        let el = l[k];
+        if(el["id"]+"" === id){
+            //console.log(el,id);
+            return el["stop_name"]
         }
     }
     return false;
@@ -200,20 +220,33 @@ function nameToId(name){
  * @returns {string|number} returns number if there is route between stops; returns string msg if not
  */
 function distanceBetweenById(start,end){
+    if(!idToName(start) || !idToName(end)){
+        return "No stop with specyfic id, check the list containg stopss";
+    }
     let dist = measureAllDistances(start);
+    var resultObj ={"stops": [{
+            "name": idToName(start)
+          },
+          {
+            "name": idToName(end)
+          }
+        ],
+        "distance": 0
+      }
     if(dist[end] && dist[start]){
         //alghoritm measres distance if start and end are the same stop
         if(start === end){
-            return 0;
+            resultObj.distance = 0;
+            return resultObj;
         }
-
-            if(dist[end].value !== undefined){
-                return dist[end].value
-            }
-            else{
-                //some of generated graphs hadn't routs to every single stop
-                return "No route to the stop"
-            }
+        if(dist[end].value !== undefined){
+            resultObj.distance = dist[end].value;
+            return resultObj;
+        }
+        else{
+            //some of generated graphs hadn't routs to every single stop
+            return "No route to the stop"
+        }
     }
     else{
         return "No stop with specyfic id, check the list containg stops"
