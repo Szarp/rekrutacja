@@ -71,3 +71,9 @@ module.exports = function(passport) {
 
     }
 };
+// #### TODO ####
+// - keep users in database (eg. mongoose, Firebase)
+// - add password validation (8 characters, one big, number, special char)
+// - disable spcial charakters in username
+// - loging with providers (eg. Google - http://www.passportjs.org/docs/google/ )
+// - password recovery
