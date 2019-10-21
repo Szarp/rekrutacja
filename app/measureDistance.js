@@ -266,7 +266,7 @@ function distanceBetweenByName(start,end){
     }
     let dist = measureAllDistances(start);
     if(dist[end] && dist[start]){
-        //alghoritm measres distance if start and end are the same stop
+        //alghoritm measures distance even if start and end are the same stop
         if(start === end){
             return 0;
         }

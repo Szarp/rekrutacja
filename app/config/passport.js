@@ -16,7 +16,6 @@ module.exports = function(passport) {
         passwordField : 'pass'
     },
     function (username, password, cb) {
-        console.log(username,password,"hi");
         let index = userList.indexOf(username);
                 let validUser = false;
                 if(index == -1){
@@ -62,6 +61,7 @@ module.exports = function(passport) {
     /**
      * Function to add user to list and save to file
      * @param {object} userObj object containg {username:,hash_password_id}
+     * @returns {boolean} always true
      */
     function addUserToFile(userObj){
         users.all_users.push(userObj);

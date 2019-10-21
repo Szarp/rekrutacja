@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <title>JaKDojade in Solvro City</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <style>
+        body         { padding-top:80px; word-wrap:break-word; }
+    </style>
+    <script>
+        var stopsList;
+    function request(){
+        var A = document.getElementById("A").value;
+        var B = document.getElementById("B").value;
+        console.log(A,B);
+        var request = new XMLHttpRequest();
+        var params = "";
+        var url = "/stops";
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                //console.log(this.responseText);
+                stopsList = JSON.parse(this.responseText);
+                loadOptions(stopsList);
+                alert(this.responseText);
+            }
+        };
+
+        request.open('GET', url, true);
+        //request.setRequestHeader('api-key', 'your-api-key');
+        request.setRequestHeader("Content-type", "application/json");
+        request.send(params);
+    }
+    function makeOptionString(oneStop){
+        //--------------------------------deleting the "Przystanek" part in stop name
+        return "<option value="+oneStop.id+">"+oneStop.stop_name.slice(11)+"</option>";
+
+    }
+    function allOptionsString(stops){
+        var str = "";
+        for(var i in stops){
+            str+=makeOptionString(stops[i]);
+        }
+        return str;
+    }
+    function loadOptions(stops){
+        var optionsString = allOptionsString(stops);
+        var sourceId = "A",targetId = "B";
+        document.getElementById(sourceId).innerHTML = optionsString;
+        document.getElementById(targetId).innerHTML = optionsString;
+
+    }
+    function distance (){
+        var A = document.getElementById("A").value;
+        var B = document.getElementById("B").value;
+        var request = new XMLHttpRequest();
+        var params = "?source="+A+"&target="+B;
+        var url = "/path"+params;
+        console.log(params);
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                //console.log(this.responseText);
+                alert(this.responseText);
+            }
+        };
+
+        request.open('GET', url, true);
+        //request.setRequestHeader('api-key', 'your-api-key');
+        request.setRequestHeader("Content-type", "application/json");
+        request.send();
+    }
+    function click(){
+        console.log("hi");
+        var A = document.getElementById("A").value;
+        var B = document.getElementById("B").value;
+        console.log(A,B);
+    }
+    </script>
+</head>
+<body onload="request();">
+    <div class="container">
+        <div class="page-header text-center">
+            <h2>JaKDojade in Solvro City</h2>
+            <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        </div>
+        <div class="row">
+            <form>
+                <div class="form-group">
+                    <label>Przystanek początkowy</label>
+                    <select id="A" class="form-control">
+                        <option value="1">1</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Przystanek koncowy</label>
+                    <select id="B" class="form-control">
+                        <option value="1">1</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <button onclick="distance();" class="btn btn-default btn-sm">Sprawdź odległość</button>
+    </div>
+</body>
+</html>
