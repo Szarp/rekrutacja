@@ -2,7 +2,7 @@ var bcrypt   = require('bcrypt-nodejs');
 var Strategy = require('passport-local').Strategy;
 var fs = require('fs');
 
-let users = fs.readFileSync('./app/config/userList1.json',"utf-8");
+let users = fs.readFileSync('./app/config/userList.json',"utf-8");
 users = JSON.parse(users);
 var allUsers = users.all_users;
 var userList = users.user_list;
@@ -66,7 +66,7 @@ module.exports = function(passport) {
     function addUserToFile(userObj){
         users.all_users.push(userObj);
         users.user_list.push(userObj.username);
-        fs.writeFileSync('./app/config/userList1.json',JSON.stringify(users),"utf-8");
+        fs.writeFileSync('./app/config/userList.json',JSON.stringify(users),"utf-8");
         return true;
 
     }

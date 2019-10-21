@@ -1,5 +1,5 @@
 const distance = require('./measureDistance.js');
-distance.loadFile('solvro_city1.json');
+distance.loadFile('solvro_city.json');
 
 module.exports = function(app, passport) {
     /**
