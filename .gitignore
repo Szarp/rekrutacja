@@ -1,1 +1,2 @@
-backend/npm_modules
+node_modules/*
+userList*
