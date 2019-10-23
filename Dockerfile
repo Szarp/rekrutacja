@@ -8,8 +8,8 @@ COPY views ./views
 COPY solvro_city.json ./
 COPY package.json ./
 COPY app.js ./
+RUN chown -R developer:developer /home/developer
 USER developer
-#RUN npm install
+RUN npm install
 EXPOSE 3000
 CMD [ "node", "app.js" ]
-
