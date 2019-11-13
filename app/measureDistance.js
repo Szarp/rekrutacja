@@ -1,14 +1,14 @@
 var fs = require('fs');
 var traces,
-    isVisited ={},
+    isVisited = {},
     cityList;
 /**
  *Making array containing visited stops and distance to Start
 * @param {obj} parsed file
 */
-function prepareIsVisitedArray(json_file){
-    for (var k =0;k<json_file.nodes.length;k++){
-        isVisited[json_file.nodes[k].id]={"isVisited":false,"value":undefined};
+function prepareIsVisitedArray(json_file) {
+    for (var k = 0; k < json_file.nodes.length; k++) {
+        isVisited[json_file.nodes[k].id] = { "isVisited": false, "value": undefined };
     }
     return;
 }
@@ -16,10 +16,10 @@ function prepareIsVisitedArray(json_file){
  *Making array containing visited stops and distance to Start
 * @param {obj} parsed file
 */
-function clearIsVisitedArray(){
-    for (var k =0;k<isVisited.length;k++){
-        isVisited[k]={"isVisited":false,"value":undefined};
-        console.log("clear",isVisited);
+function clearIsVisitedArray() {
+    for (var k = 0; k < isVisited.length; k++) {
+        isVisited[k] = { "isVisited": false, "value": undefined };
+        console.log("clear", isVisited);
     }
     return;
 }
@@ -28,12 +28,13 @@ function clearIsVisitedArray(){
  * @param {obj} parsed file
  * @returns {null}
  */
-function makeBidirectional(json_file){
+function makeBidirectional(json_file) {
     traces = json_file["links"];
     let len = traces.length;
-    for(var i=0;i<len;i++){
+    for (var i = 0; i < len; i++) {
         let el = traces[i];
-        traces.push({"distance":el.distance,"source": el.target,"target": el.source
+        traces.push({
+            "distance": el.distance, "source": el.target, "target": el.source
         });
     }
     return null;
@@ -47,42 +48,42 @@ function makeBidirectional(json_file){
     - id in links must be same in nodes
     -
 */
-function checkFile(parsedFile){
+function checkFile(parsedFile) {
     console.log("hi")
-    let nodes,links,el;
-    try{
-        if(parsedFile.nodes === undefined){
+    let nodes, links, el;
+    try {
+        if (parsedFile.nodes === undefined) {
             throw ("No nodes in file")
         }
-        if(parsedFile.links === undefined){
+        if (parsedFile.links === undefined) {
             throw ("No links in file")
         }
         nodes = parsedFile.nodes;
         links = parsedFile.links;
-        if(nodes.length == 0 || links.length == 0){
-            throw("Empty element list");
+        if (nodes.length == 0 || links.length == 0) {
+            throw ("Empty element list");
         }
-        for (let k=0;k<nodes.length;k++){
-            if(nodes[k].id === undefined){
-                throw("No id in "+k+"\'s element");
+        for (let k = 0; k < nodes.length; k++) {
+            if (nodes[k].id === undefined) {
+                throw ("No id in " + k + "\'s element");
             }
-            if(nodes[k].stop_name === undefined){
-                throw("No stop_name in "+k+"\'s element");
-            }
-        }
-        for (let k=0;k<links.length;k++){
-            if(links[k].distance === undefined){
-                throw("No distance in "+k+"\'s element");
-            }
-            if(links[k].source === undefined){
-                throw("No source in "+k+"\'s element");
-            }
-            if(links[k].target === undefined){
-                throw("No target in "+k+"\'s element");
+            if (nodes[k].stop_name === undefined) {
+                throw ("No stop_name in " + k + "\'s element");
             }
         }
-    }catch(e){
-        throw(e)
+        for (let k = 0; k < links.length; k++) {
+            if (links[k].distance === undefined) {
+                throw ("No distance in " + k + "\'s element");
+            }
+            if (links[k].source === undefined) {
+                throw ("No source in " + k + "\'s element");
+            }
+            if (links[k].target === undefined) {
+                throw ("No target in " + k + "\'s element");
+            }
+        }
+    } catch (e) {
+        throw (e)
     }
 }
 
@@ -91,18 +92,18 @@ function checkFile(parsedFile){
  * Initialize .json file
  * @param {string} filename name of the .json file
  */
-function Init(filename){
+function Init(filename) {
     //solvro_city.json
-    let f = fs.readFileSync(filename,"utf-8");
-    if(!f){
-        throw("Empty .json file");
+    let f = fs.readFileSync(filename, "utf-8");
+    if (!f) {
+        throw ("Empty .json file");
     }
     var json_file;
     try {
         json_file = JSON.parse(f);
     }
     catch (e) {
-        throw(e);
+        throw (e);
     }
     checkFile(json_file);
     prepareIsVisitedArray(json_file);
@@ -114,14 +115,14 @@ function Init(filename){
  * @param {string} start id of the starting stop
  * @returns {number} if everything ok returns 0 else 1
 */
-function initializeDistances(start){
+function initializeDistances(start) {
     clearIsVisitedArray();
-    for(var i=0;i<traces.length;i++){
-        if(traces[i].source == start){
+    for (var i = 0; i < traces.length; i++) {
+        if (traces[i].source == start) {
             isVisited[traces[i].target].value = traces[i].distance;
         }
     }
-    if(markAsVisited(start)){
+    if (markAsVisited(start)) {
         return 1;
     }
     else return 0;
@@ -130,15 +131,15 @@ function initializeDistances(start){
  * Searching through traces array to find the shortest distance to next stop
 * @param {string} start type: string id of the starting stop
 */
-function findDistances(target){
+function findDistances(target) {
     var previousDistace = isVisited[target].value;
-    for(var i=0;i<traces.length;i++){
+    for (var i = 0; i < traces.length; i++) {
         var found = traces[i];
-        if(found.source == target){
+        if (found.source == target) {
             let distanceToStart = isVisited[found.target].value;
             let measuredDistance = found.distance + previousDistace;
             //console.log(distanceToStart,measuredDistance);
-            if(distanceToStart == undefined || (distanceToStart > measuredDistance)){
+            if (distanceToStart == undefined || (distanceToStart > measuredDistance)) {
                 isVisited[found.target].value = measuredDistance;
             }
         }
@@ -150,17 +151,17 @@ function findDistances(target){
  * @param {string} target marking as visited in isVisited array
  * @returns {number} retuns 1
  */
-function markAsVisited(target){
+function markAsVisited(target) {
     isVisited[target].isVisited = true;
     return 1;
 }
 /**
  * @returns {string} id of the next city to 'visit'|false if thre is no city left
  */
-function chooseSubTarget(){
-    for(k in isVisited){
-        if(isVisited[k].isVisited == false && isVisited[k].value != undefined){
-            isVisited[k].isVisited=true;
+function chooseSubTarget() {
+    for (k in isVisited) {
+        if (isVisited[k].isVisited == false && isVisited[k].value != undefined) {
+            isVisited[k].isVisited = true;
             return k
         }
     }
@@ -170,30 +171,30 @@ function chooseSubTarget(){
  * @param {string} Start id of first element to measure from
  * @returns {Array} list of distances between Start and all stops
  */
-function measureAllDistances(start){
+function measureAllDistances(start) {
     initializeDistances(start);
-    var nextCity = chooseSubTarget() ;
-    while(nextCity){
+    var nextCity = chooseSubTarget();
+    while (nextCity) {
         findDistances(nextCity);
-        nextCity =chooseSubTarget()
+        nextCity = chooseSubTarget()
     }
     return isVisited;
 }
 /**
  * @returns list containg stops names and ids
  */
-function cityNames(){
+function cityNames() {
     return cityList;
 }
 /**
  * @param {string} name name of the stop
  * @returns {string|boolean} id of the stop if is in the list; false if found nothing
  */
-function nameToId(name){
+function nameToId(name) {
     let l = cityNames();
-    for (var k=0; k<l.length;k++){
+    for (var k = 0; k < l.length; k++) {
         let el = l[k];
-        if(el["stop_name"] === name){
+        if (el["stop_name"] === name) {
             return el["id"]
         }
     }
@@ -203,11 +204,11 @@ function nameToId(name){
  * @param {string} id id of the stop
  * @returns {string|boolean} name of the stop if is in the list; false if found nothing
  */
-function idToName(id){
+function idToName(id) {
     let l = cityNames();
-    for (var k=0; k<l.length;k++){
+    for (var k = 0; k < l.length; k++) {
         let el = l[k];
-        if(el["id"]+"" === id){
+        if (el["id"] + "" === id) {
             //console.log(el,id);
             return el["stop_name"]
         }
@@ -219,36 +220,37 @@ function idToName(id){
  * @param {string} stop id of ending stop
  * @returns {string|number} returns number if there is route between stops; returns string msg if not
  */
-function distanceBetweenById(start,end){
-    if(!idToName(start) || !idToName(end)){
+function distanceBetweenById(start, end) {
+    if (!idToName(start) || !idToName(end)) {
         return "No stop with specyfic id, check the list containg stopss";
     }
     let dist = measureAllDistances(start);
-    var resultObj ={"stops": [{
+    var resultObj = {
+        "stops": [{
             "name": idToName(start)
-          },
-          {
+        },
+        {
             "name": idToName(end)
-          }
+        }
         ],
         "distance": 0
-      }
-    if(dist[end] && dist[start]){
+    }
+    if (dist[end] && dist[start]) {
         //alghoritm measres distance if start and end are the same stop
-        if(start === end){
+        if (start === end) {
             resultObj.distance = 0;
             return resultObj;
         }
-        if(dist[end].value !== undefined){
+        if (dist[end].value !== undefined) {
             resultObj.distance = dist[end].value;
             return resultObj;
         }
-        else{
+        else {
             //some of generated graphs hadn't routs to every single stop
             return "No route to the stop"
         }
     }
-    else{
+    else {
         return "No stop with specyfic id, check the list containg stops"
     }
 }
@@ -258,27 +260,27 @@ function distanceBetweenById(start,end){
  * @param {string} stop name of ending stop
  * @returns {string|number} number if there is route between stops; returns string msg if not
  */
-function distanceBetweenByName(start,end){
+function distanceBetweenByName(start, end) {
     let startId = nameToId(start);
     let endId = nameToId(end);
-    if(startId == false || endId == false){
+    if (startId == false || endId == false) {
         return "No stop with specyfic name, check the list containg stops"
     }
     let dist = measureAllDistances(start);
-    if(dist[end] && dist[start]){
+    if (dist[end] && dist[start]) {
         //alghoritm measures distance even if start and end are the same stop
-        if(start === end){
+        if (start === end) {
             return 0;
         }
-        if(dist[end].value !== undefined){
+        if (dist[end].value !== undefined) {
             return dist[end].value
         }
-        else{
+        else {
             //some of generated graphs hadn't routs to every single stop
             return "No route to the stop"
         }
     }
-    else{
+    else {
         return "No stop with specyfic name, check the list containg stops"
     }
 }

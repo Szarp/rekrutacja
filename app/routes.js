@@ -1,7 +1,7 @@
 const distance = require('./measureDistance.js');
 distance.loadFile('solvro_city.json');
 
-module.exports = function(app, passport) {
+module.exports = function (app, passport) {
     /**
    * @swagger
    * /:
@@ -17,17 +17,17 @@ module.exports = function(app, passport) {
             user: req.user
         });
     });
-    app.post('/dystans',function (req, res, next) {
+    app.post('/dystans', function (req, res, next) {
         if (req.isAuthenticated()) {
             console.log(req.body)
             console.log("logged");
             //???
-            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+            res.writeHead(200, "OK", { 'Content-Type': 'text/plain' });
         }
         else
-        res.redirect('/login');
+            res.redirect('/login');
     });
-    app.get('/dystans',function (req, res) {
+    app.get('/dystans', function (req, res) {
         res.render('index', {
             layout: 'dystans',
             user: req.user
@@ -45,11 +45,11 @@ module.exports = function(app, passport) {
    */
     app.get('/login',
         function (req, res) {
-        res.render('index', {
-            layout: 'login',
-            user: req.user
+            res.render('index', {
+                layout: 'login',
+                user: req.user
+            });
         });
-    });
     /**
    * @swagger
    * /login:
@@ -73,9 +73,9 @@ module.exports = function(app, passport) {
    *         description: Redirect to /profile if succesfully logged
    */
     app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/profile',
-        failureRedirect : '/login',
-        failureFlash : false // allow flash messages
+        successRedirect: '/profile',
+        failureRedirect: '/login',
+        failureFlash: false // allow flash messages
     }));
     // PROFILE ==============================
     /**
@@ -87,10 +87,10 @@ module.exports = function(app, passport) {
    *       200:
    *         description: Redirect to /profile if user is logged; to /login
    */
-    app.get('/profile', isLoggedIn, function(req, res) {
+    app.get('/profile', isLoggedIn, function (req, res) {
         res.render('index', {
             layout: 'profile',
-            user : req.user
+            user: req.user
         });
     });
     // SIGNUP ==============================
@@ -103,8 +103,8 @@ module.exports = function(app, passport) {
    *       200:
    *         description: Page with form to login
    */
-    app.get('/signup', function(req, res) {
-        res.render('index',{
+    app.get('/signup', function (req, res) {
+        res.render('index', {
             layout: 'signup'
         });
     });
@@ -131,9 +131,9 @@ module.exports = function(app, passport) {
    *         description: Redirect to /profile if user is logged; to /signup if not
    */
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect : '/profile',
-        failureRedirect : '/signup',
-        failureFlash : false // allow flash messages
+        successRedirect: '/profile',
+        failureRedirect: '/signup',
+        failureFlash: false // allow flash messages
     }));
 
     // LOGOUT ==============================
@@ -146,7 +146,7 @@ module.exports = function(app, passport) {
    *       200:
    *         description: Redirect /home
    */
-    app.get('/logout', function(req, res) {
+    app.get('/logout', function (req, res) {
         req.logout();
         res.redirect('/');
     });
@@ -173,7 +173,7 @@ module.exports = function(app, passport) {
      *                  ]
      *              }
      */
-    app.get('/stops', function(req, res) {
+    app.get('/stops', function (req, res) {
         console.log(distance.cityNames());
         res.send(distance.cityNames());
         //res.redirect('/');
@@ -215,17 +215,17 @@ module.exports = function(app, passport) {
      *                   "distance": 12
      *               }
     */
-    app.get('/path', function(req, res) {
+    app.get('/path', function (req, res) {
         //console.log(distance.distById("1","2"));
         var params = req.query,
             s = params["source"],
             t = params["target"];
-        if(s && t){
+        if (s && t) {
             //distance.initializeDistances(s)
             //console.log(distance.distById(s,t));
-            res.send(distance.distById(s,t));
+            res.send(distance.distById(s, t));
         }
-        else{
+        else {
             console.log("no parameters");
             res.send("no parameters")
         }
