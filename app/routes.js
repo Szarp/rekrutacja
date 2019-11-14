@@ -51,22 +51,31 @@ module.exports = function (app, passport) {
    *          required: true
    *          schema:
    *            type: string
-   *          description: Stop where the path begins
+   *          description: Username
    *        - in: query
    *          name: pass
    *          required: true
    *          schema:
    *            type: string
-   *          description: Stop where the path ends
+   *          description: password
    *     responses:
    *       200:
-   *         description: Redirect to /profile if succesfully logged
-   */
-    app.post('/login', passport.authenticate('local-login', {
-        successRedirect: '/profile',
-        failureRedirect: '/login',
-        failureFlash: false // allow flash messages
-    }));
+   *         description: Succesful login
+   *       401:
+   *         description: Can't login
+   * */
+    app.post('/login', function(req, res,next) {
+        passport.authenticate('local-login',function(err,user){
+            if (!user) {
+                return res.status(401).json({message:"Invalid credentials"});
+            }
+            req.logIn(user, function(err) {
+                if (err) { return next(err); }
+                    return res.status(200).json({message:"Nice to see you"});
+            });
+
+        })(req,res,next);
+    });
     // PROFILE ==============================
     /**
    * @swagger
@@ -75,8 +84,9 @@ module.exports = function (app, passport) {
    *     description: Profile page for logged users
    *     responses:
    *       200:
-   *         description: Redirect to /profile if user is logged; to /login
-   */
+   *         description: redirect to /profile
+   *
+   * */
     app.get('/profile', isLoggedIn, function (req, res) {
         res.render('index', {
             layout: 'profile',
@@ -109,22 +119,31 @@ module.exports = function (app, passport) {
    *         required: true
    *         schema:
    *           type: string
-   *         description: Stop where the path begins
+   *         description: username
    *       - in: query
    *         name: pass
    *         required: true
    *         schema:
    *           type: string
-   *         description: Stop where the path ends
+   *         description: password
    *     responses:
    *       200:
-   *         description: Redirect to /profile if user is logged; to /signup if not
+   *         description: Succesful signup
+   *       401:
+   *         description: Invalid name
    */
-    app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/profile',
-        failureRedirect: '/signup',
-        failureFlash: false // allow flash messages
-    }));
+    app.post('/signup', function(req, res, next) {
+        passport.authenticate('local-signup',function(err,user){
+            if (!user) {
+                return res.status(401).json({message:"There is an user with same nickname, please change it"});
+            }
+            req.logIn(user, function(err) {
+                if (err) { return next(err); }
+                    return res.status(200).json({message:"Nice to see you"});
+            });
+
+        })(req,res,next);
+    });
 
     // LOGOUT ==============================
     /**
@@ -138,7 +157,9 @@ module.exports = function (app, passport) {
    */
     app.get('/logout', function (req, res) {
         req.logout();
-        res.redirect('/');
+        res.status(200).json({
+            "message": 'See you soon'
+        });
     });
     /**
      * @swagger
@@ -177,6 +198,8 @@ module.exports = function (app, passport) {
      *       responses:
      *           200:
      *               description: JSON containing stops and total distance.
+     *           401:
+     *               description: Invalid stops; can't measure distance
      *               content:
      *                   application/json:
      *               schema:
@@ -190,16 +213,16 @@ module.exports = function (app, passport) {
             res.send(distance.distById(s, t));
         }
         else {
-            res.send("no parameters")
+            res.status(401).json({
+                "message": 'no parameters'
+            });
         }
-        //console.log(req.query);
-        //res.send(distance.distById("0","0"))
-        //res.redirect('/');
-        //res.send("ok");
     });
     function isLoggedIn(req, res, next) {
         if (req.isAuthenticated())
             return next();
-        res.redirect('/login');
+        res.status(401).json({
+            "message": 'You\'re not logged'
+        });
     }
 }
