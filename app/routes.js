@@ -17,12 +17,6 @@ module.exports = function (app, passport) {
             user: req.user
         });
     });
-    app.get('/dystans', function (req, res) {
-        res.render('index', {
-            layout: 'dystans',
-            user: req.user
-        });
-    });
     // LOGIN ==============================
     /**
    * @swagger
