@@ -144,10 +144,10 @@ function findDistances(target) {
  * @returns {number} retuns 1
  */
 function markAsVisited(target) {
-    if(isVisited[target].isVisited !== undefined){
+    if (isVisited[target].isVisited !== undefined) {
         isVisited[target].isVisited = true;
     }
-    else{
+    else {
         throw "Invalid target";
     }
 }

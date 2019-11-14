@@ -58,17 +58,17 @@ module.exports = function (app, passport) {
    *       401:
    *         description: Can't login
    * */
-    app.post('/login', function(req, res,next) {
-        passport.authenticate('local-login',function(err,user){
+    app.post('/login', function (req, res, next) {
+        passport.authenticate('local-login', function (err, user) {
             if (!user) {
-                return res.status(401).json({message:"Invalid credentials"});
+                return res.status(401).json({ message: "Invalid credentials" });
             }
-            req.logIn(user, function(err) {
+            req.logIn(user, function (err) {
                 if (err) { return next(err); }
-                    return res.status(200).json({message:"Nice to see you"});
+                return res.status(200).json({ message: "Nice to see you" });
             });
 
-        })(req,res,next);
+        })(req, res, next);
     });
     // PROFILE ==============================
     /**
@@ -126,17 +126,17 @@ module.exports = function (app, passport) {
    *       401:
    *         description: Invalid name
    */
-    app.post('/signup', function(req, res, next) {
-        passport.authenticate('local-signup',function(err,user){
+    app.post('/signup', function (req, res, next) {
+        passport.authenticate('local-signup', function (err, user) {
             if (!user) {
-                return res.status(401).json({message:"There is an user with same nickname, please change it"});
+                return res.status(401).json({ message: "There is an user with same nickname, please change it" });
             }
-            req.logIn(user, function(err) {
+            req.logIn(user, function (err) {
                 if (err) { return next(err); }
-                    return res.status(200).json({message:"Nice to see you"});
+                return res.status(200).json({ message: "Nice to see you" });
             });
 
-        })(req,res,next);
+        })(req, res, next);
     });
 
     // LOGOUT ==============================
@@ -175,10 +175,10 @@ module.exports = function (app, passport) {
      *                  type: object
      */
     app.get('/stops', function (req, res) {
-        try{
+        try {
             res.send(distance.cityNames());
         }
-        catch(e){
+        catch (e) {
             res.status(401).json({
                 "message": e
             });
@@ -217,10 +217,10 @@ module.exports = function (app, passport) {
             s = params["source"],
             t = params["target"];
         if (s && t) {
-            try{
+            try {
                 res.send(distance.distById(s, t));
             }
-            catch(e){
+            catch (e) {
                 res.status(401).json({
                     "message": e
                 });
