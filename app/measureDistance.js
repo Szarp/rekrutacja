@@ -6,11 +6,10 @@ var traces,
  *Making array containing visited stops and distance to Start
 * @param {obj} parsed file
 */
-function prepareIsVisitedArray(json_file) {
-    for (var k = 0; k < json_file.nodes.length; k++) {
-        isVisited[json_file.nodes[k].id] = { "isVisited": false, "value": undefined };
+function prepareIsVisitedArray(jsonFile) {
+    for (var k = 0; k < jsonFile.nodes.length; k++) {
+        isVisited[jsonFile.nodes[k].id] = { "isVisited": false, "value": undefined };
     }
-    return;
 }
 /**
  *Making array containing visited stops and distance to Start
@@ -20,15 +19,14 @@ function clearIsVisitedArray() {
     for (var k = 0; k < isVisited.length; k++) {
         isVisited[k] = { "isVisited": false, "value": undefined };
     }
-    return;
 }
 /**
  * making traces bi-directional
  * @param {obj} parsed file
  * @returns {null}
  */
-function makeBidirectional(json_file) {
-    traces = json_file["links"];
+function makeBidirectional(jsonFile) {
+    traces = jsonFile["links"];
     let len = traces.length;
     for (var i = 0; i < len; i++) {
         let el = traces[i];
@@ -36,7 +34,6 @@ function makeBidirectional(json_file) {
             "distance": el.distance, "source": el.target, "target": el.source
         });
     }
-    return null;
 }
 /*
 .json file must have:
@@ -96,17 +93,17 @@ function Init(filename) {
     if (!f) {
         throw ("Empty .json file");
     }
-    var json_file;
+    var jsonFile;
     try {
-        json_file = JSON.parse(f);
+        jsonFile = JSON.parse(f);
     }
     catch (e) {
         throw (e);
     }
-    checkFile(json_file);
-    prepareIsVisitedArray(json_file);
-    makeBidirectional(json_file);
-    cityList = json_file.nodes;
+    checkFile(jsonFile);
+    prepareIsVisitedArray(jsonFile);
+    makeBidirectional(jsonFile);
+    cityList = jsonFile.nodes;
 }
 /**
  * Define begining stop
@@ -120,10 +117,7 @@ function initializeDistances(start) {
             isVisited[traces[i].target].value = traces[i].distance;
         }
     }
-    if (markAsVisited(start)) {
-        return 1;
-    }
-    else return 0;
+    markAsVisited(start);
 }
 /**
  * Searching through traces array to find the shortest distance to next stop
@@ -150,8 +144,12 @@ function findDistances(target) {
  * @returns {number} retuns 1
  */
 function markAsVisited(target) {
-    isVisited[target].isVisited = true;
-    return 1;
+    if(isVisited[target].isVisited !== undefined){
+        isVisited[target].isVisited = true;
+    }
+    else{
+        throw "Invalid target";
+    }
 }
 /**
  * @returns {string} id of the next city to 'visit'|false if thre is no city left
@@ -196,7 +194,7 @@ function nameToId(name) {
             return el["id"]
         }
     }
-    return false;
+    throw "No element with specific name";
 }
 /**
  * @param {string} id id of the stop
@@ -207,11 +205,10 @@ function idToName(id) {
     for (var k = 0; k < l.length; k++) {
         let el = l[k];
         if (el["id"] + "" === id) {
-            //console.log(el,id);
             return el["stop_name"]
         }
     }
-    return false;
+    throw "No element with specific id";
 }
 /**
  * @param {string} start  id of staring stop
@@ -220,7 +217,8 @@ function idToName(id) {
  */
 function distanceBetweenById(start, end) {
     if (!idToName(start) || !idToName(end)) {
-        return "No stop with specyfic id, check the list containg stopss";
+        throw "No stop with specyfic id, check the list containg stops";
+        return;
     }
     let dist = measureAllDistances(start);
     var resultObj = {
@@ -245,11 +243,13 @@ function distanceBetweenById(start, end) {
         }
         else {
             //some of generated graphs hadn't routs to every single stop
-            return "No route to the stop"
+            throw "No route to the stop";
+            return;
         }
     }
     else {
-        return "No stop with specyfic id, check the list containg stops"
+        throw "No stop with specyfic id, check the list containg stops";
+        return;
     }
 }
 /**
@@ -262,7 +262,7 @@ function distanceBetweenByName(start, end) {
     let startId = nameToId(start);
     let endId = nameToId(end);
     if (startId == false || endId == false) {
-        return "No stop with specyfic name, check the list containg stops"
+        throw "No stop with specyfic name, check the list containg stops";
     }
     let dist = measureAllDistances(start);
     if (dist[end] && dist[start]) {
@@ -275,11 +275,11 @@ function distanceBetweenByName(start, end) {
         }
         else {
             //some of generated graphs hadn't routs to every single stop
-            return "No route to the stop"
+            throw "No route to the stop"
         }
     }
     else {
-        return "No stop with specyfic name, check the list containg stops"
+        throw "No stop with specyfic name, check the list containg stops"
     }
 }
 module.exports.loadFile = Init;

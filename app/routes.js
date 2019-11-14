@@ -167,9 +167,22 @@ module.exports = function (app, passport) {
      *                  application/json:
      *              schema:
      *                  type: object
+     *          401:
+     *              description: JSON with error msg
+     *              content:
+     *                  application/json:
+     *              schema:
+     *                  type: object
      */
     app.get('/stops', function (req, res) {
-        res.send(distance.cityNames());
+        try{
+            res.send(distance.cityNames());
+        }
+        catch(e){
+            res.status(401).json({
+                "message": e
+            });
+        }
     });
     /**
      * @swagger
@@ -204,7 +217,15 @@ module.exports = function (app, passport) {
             s = params["source"],
             t = params["target"];
         if (s && t) {
-            res.send(distance.distById(s, t));
+            try{
+                res.send(distance.distById(s, t));
+            }
+            catch(e){
+                res.status(401).json({
+                    "message": e
+                });
+            }
+
         }
         else {
             res.status(401).json({
