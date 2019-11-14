@@ -130,7 +130,6 @@ function findDistances(target) {
         if (found.source == target) {
             let distanceToStart = isVisited[found.target].value;
             let measuredDistance = found.distance + previousDistace;
-            //console.log(distanceToStart,measuredDistance);
             if (distanceToStart == undefined || (distanceToStart > measuredDistance)) {
                 isVisited[found.target].value = measuredDistance;
             }
