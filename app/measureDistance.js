@@ -19,7 +19,6 @@ function prepareIsVisitedArray(json_file) {
 function clearIsVisitedArray() {
     for (var k = 0; k < isVisited.length; k++) {
         isVisited[k] = { "isVisited": false, "value": undefined };
-        console.log("clear", isVisited);
     }
     return;
 }
@@ -49,7 +48,6 @@ function makeBidirectional(json_file) {
     -
 */
 function checkFile(parsedFile) {
-    console.log("hi")
     let nodes, links, el;
     try {
         if (parsedFile.nodes === undefined) {

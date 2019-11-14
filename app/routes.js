@@ -17,16 +17,6 @@ module.exports = function (app, passport) {
             user: req.user
         });
     });
-    app.post('/dystans', function (req, res, next) {
-        if (req.isAuthenticated()) {
-            console.log(req.body)
-            console.log("logged");
-            //???
-            res.writeHead(200, "OK", { 'Content-Type': 'text/plain' });
-        }
-        else
-            res.redirect('/login');
-    });
     app.get('/dystans', function (req, res) {
         res.render('index', {
             layout: 'dystans',
@@ -162,21 +152,9 @@ module.exports = function (app, passport) {
      *                  application/json:
      *              schema:
      *                  type: object
-     *              example: {
-     *                  "stops": [
-     *                  {
-     *                      "name": "Przystanek 1"
-     *                 },
-     *                  {
-     *                      "name": "Przystanek 2"
-     *                 }
-     *                  ]
-     *              }
      */
     app.get('/stops', function (req, res) {
-        console.log(distance.cityNames());
         res.send(distance.cityNames());
-        //res.redirect('/');
     });
     /**
      * @swagger
@@ -203,30 +181,15 @@ module.exports = function (app, passport) {
      *                   application/json:
      *               schema:
      *                   type: object
-     *               example: {
-     *                   "stops": [
-     *                   {
-     *                       "name": "Przystanek 1"
-     *                   },
-     *                   {
-     *                       "name": "Przystanek 2"
-     *                   }
-     *                   ],
-     *                   "distance": 12
-     *               }
-    */
+     */
     app.get('/path', function (req, res) {
-        //console.log(distance.distById("1","2"));
         var params = req.query,
             s = params["source"],
             t = params["target"];
         if (s && t) {
-            //distance.initializeDistances(s)
-            //console.log(distance.distById(s,t));
             res.send(distance.distById(s, t));
         }
         else {
-            console.log("no parameters");
             res.send("no parameters")
         }
         //console.log(req.query);

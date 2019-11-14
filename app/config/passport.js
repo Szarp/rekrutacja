@@ -23,12 +23,7 @@ module.exports = function (passport) {
                 let userObj = { "username": username, "hash_password": hash, "id": allUsers.length };
                 addUserToFile(userObj);
                 return cb(null, userObj.id);
-                //console.log(userObj);
             }
-            else {
-                console.log("There is an user with same nickname, please change it");
-            }
-            return cb(null, false);
             return cb(null, false);
         }));
     /**
