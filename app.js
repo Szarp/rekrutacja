@@ -8,19 +8,6 @@ const distance = require('./app/measureDistance.js');
 const app = express()
 const port = 3000;
 
-//app.get('/', (req, res) => res.send('Hello World!'))
-
-//app.listen(port, () => console.log(`Example app listening on port ${port}!`))
-//app.post('/login', passport.authenticate('local', { successRedirect: '/',failureRedirect: '/login' }));
-
-// DISTANCE ========
-//(this); //load module containing alghoritm
-//distance.loadFile('solvro_city1.json');
-//distance.loadFile('test.json');
-//console.log(distance.measuredDistances("0"));
-//console.log(distance.cityNames());
-//console.log(distance.distById("0","0"));
-
 // my not so secret secret
 var secret = 'eeeek';
 
